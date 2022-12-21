@@ -36,7 +36,7 @@ func newEngine(ctx *cli.Context) *engine {
 			rl.CameraPerspective,
 		),
 		cameraFront: rl.NewVector3(0, 0, -1),
-		cunkMan:     NewChunkManager(64),
+		cunkMan:     NewChunkManager(128),
 	}
 }
 
@@ -66,22 +66,11 @@ func mainLoop(state *engine) {
 	rl.SetShaderValue(shader, ambientLoc, []float32{0.2, 0.2, 0.2, 1.0}, rl.ShaderUniformVec4)
 	NewLight(LightTypeDirectional, rl.NewVector3(50.0, 50.0, 0.0), rl.Vector3Zero(), rl.Beige, shader)
 
-	materials := make([]rl.Material, 3)
-
-	materials[0] = rl.LoadMaterialDefault()
-	materials[0].Shader = shader
-	materials[0].Maps.Texture = rl.LoadTexture("res/textures/dirt.png")
-	materials[0].GetMap(rl.MapDiffuse).Color = rl.White
-
-	materials[1] = rl.LoadMaterialDefault()
-	materials[1].Shader = shader
-	materials[1].Maps.Texture = rl.LoadTexture("res/textures/gras.png")
-	materials[1].GetMap(rl.MapDiffuse).Color = rl.White
-
-	materials[2] = rl.LoadMaterialDefault()
-	materials[2].Shader = shader
-	materials[2].Maps.Texture = rl.LoadTexture("res/textures/snow.png")
-	materials[2].GetMap(rl.MapDiffuse).Color = rl.White
+	addBlockMaterial(BlockTypeDirt, "res/textures/dirt.png", shader)
+	addBlockMaterial(BlockTypeGras, "res/textures/gras.png", shader)
+	addBlockMaterial(BlockTypeSnow, "res/textures/snow.png", shader)
+	addBlockMaterial(BlockTypeRock, "res/textures/rock.png", shader)
+	addBlockMaterial(BlockTypeGroud, "res/textures/ground.png", shader)
 
 	firstChunk := state.cunkMan.GetChunk(rl.Vector2Zero(), rl.White)
 	for !rl.WindowShouldClose() {
@@ -101,7 +90,7 @@ func mainLoop(state *engine) {
 				if i == 0 {
 					firstChunk = chunk
 				}
-				chunk.BuildMesh(cube, materials)
+				chunk.RenderChunk(cube)
 			}
 			rl.DrawGrid(128, 128)
 		}
